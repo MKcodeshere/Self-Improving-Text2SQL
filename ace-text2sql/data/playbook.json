@@ -1,0 +1,83 @@
+{
+  "id": "sql_playbook_v1",
+  "version": "1.0.0",
+  "last_updated": "2025-10-17T12:14:59.696083",
+  "sections": {
+    "schema_rules": [
+      {
+        "id": "sr-00001",
+        "content": "customer.customer_id → rental.customer_id (1:N relationship, one customer can have many rentals)",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "sr-00002",
+        "content": "rental.rental_id → payment.rental_id (1:N relationship, one rental can have multiple payments)",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "sr-00003",
+        "content": "film.film_id → inventory.film_id → rental.inventory_id (film availability chain: film → inventory copy → specific rental)",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "sr-00004",
+        "content": "film ←→ actor is M:N relationship via film_actor bridge table (film.film_id = film_actor.film_id AND actor.actor_id = film_actor.actor_id)",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      }
+    ],
+    "sql_patterns": [
+      {
+        "id": "code-00001",
+        "content": "-- Customer revenue calculation template\nSELECT \n  c.customer_id,\n  c.first_name || ' ' || c.last_name AS customer_name,\n  SUM(p.amount) AS total_revenue\nFROM customer c\nJOIN rental r ON c.customer_id = r.customer_id\nJOIN payment p ON r.rental_id = p.rental_id\nGROUP BY c.customer_id, c.first_name, c.last_name\nORDER BY total_revenue DESC;",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "code-00002",
+        "content": "-- LEFT JOIN pattern for including items with zero counts\nSELECT \n  f.film_id,\n  f.title,\n  COUNT(r.rental_id) AS rental_count\nFROM film f\nLEFT JOIN inventory i ON f.film_id = i.film_id\nLEFT JOIN rental r ON i.inventory_id = r.inventory_id\nGROUP BY f.film_id, f.title;",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "user-00002",
+        "content": "USER GUIDANCE: When aggregating by month or year on a timestamp/date column  Use date_trunc for the grouping key Use a range filter in WHERE so indexes can be used. Never wrap the date column in EXTRACT/DATE_PART/CAST inside WHERE",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      }
+    ],
+    "common_mistakes": [
+      {
+        "id": "ts-00001",
+        "content": "MISTAKE: Using INNER JOIN when you want to include items with zero counts (e.g., films never rented) → FIX: Use LEFT JOIN to preserve all rows from the left table",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "ts-00002",
+        "content": "MISTAKE: Forgetting GROUP BY when using aggregate functions (SUM, COUNT, AVG) → FIX: PostgreSQL requires ALL non-aggregated SELECT columns to appear in GROUP BY clause",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      },
+      {
+        "id": "ts-00003",
+        "content": "MISTAKE: Using only customer_id in GROUP BY when selecting first_name and last_name → FIX: Include ALL non-aggregated columns in GROUP BY (even if functionally dependent on PK)",
+        "usage_count": 0,
+        "helpful": 0,
+        "harmful": 0
+      }
+    ]
+  }
+}

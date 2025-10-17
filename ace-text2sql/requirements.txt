@@ -1,0 +1,26 @@
+# ACE Text-to-SQL Requirements
+# Python 3.11+
+
+# Core - Updated compatible versions
+langchain==0.2.16
+langchain-openai==0.1.23
+langchain-community==0.2.16
+langchain-core==0.2.38
+
+# LLM - Compatible with langchain-openai 0.1.23
+openai==1.55.3
+
+# Vector Store
+chromadb==0.4.24
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.30
+
+# UI
+streamlit==1.34.0
+
+# Utils
+pydantic==2.7.1
+python-dotenv==1.0.1
+pyyaml==6.0.1
